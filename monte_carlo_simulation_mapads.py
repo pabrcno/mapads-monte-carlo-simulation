@@ -14,16 +14,18 @@ def monte_carlo_simulation(num_clients, num_trials, radius, city_area, minimum_d
 
     for _ in range(num_trials):
         clients_within_radius = 0
+        # simulate ride find random start and end points
         start_x, start_y = random.uniform(0, side_length), random.uniform(0, side_length)
         end_x, end_y = random.uniform(0, side_length), random.uniform(0, side_length)
 
         for client_x, client_y in clients_positions:
+            # measure how many clients are within both end and start radius
             if distance(start_x, start_y, client_x, client_y) <= radius or distance(end_x, end_y, client_x, client_y) <= radius:
                 clients_within_radius += 1
-
+        # Sum if there are enough clients to complete the whole advertising space
         if clients_within_radius >= minimum_desired_clients:
             successful_trials += 1
-
+   # return the percentage of successes
     return successful_trials / num_trials
 
 def success_rate_city(num_clients, num_trials, radius, city_areas, minimum_desired_clients):
@@ -33,6 +35,7 @@ def success_rate_city(num_clients, num_trials, radius, city_areas, minimum_desir
         success_rates = [monte_carlo_simulation(num_clients, num_trials, radius, area, minimum_desired_clients) for _ in range(num_simulations)]
         mean_success_rate = np.mean(success_rates)
         sem = np.std(success_rates) / math.sqrt(num_trials)
+        # find lower and upper bound (assing error 4%)
         lower_bound = mean_success_rate - 1.96 * sem
         upper_bound = mean_success_rate + 1.96 * sem
         success_rate_ci[city] = (lower_bound, upper_bound)
